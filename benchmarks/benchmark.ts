@@ -1,12 +1,11 @@
-import { magicMath } from "./magic_math.ts";
-import { magicMathIterative } from "./magic_math_iterative.ts";
+import { magicMath, magicMathIterative } from "../src/algorithms/index.ts";
 
 /**
  * Runs a benchmark comparing different implementations of the Magic Math algorithm
  * @param n The input value to calculate
  * @param runs Number of runs to average time over
  */
-const runBenchmark = async (n: number, runs = 5) => {
+export const runBenchmark = async (n: number, runs = 5) => {
   console.log(`\n🔍 Benchmarking Magic Math implementations for n=${n} (${runs} runs):\n`);
   
   // Run recursive (memoized) implementation

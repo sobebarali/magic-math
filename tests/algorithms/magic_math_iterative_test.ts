@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { magicMathIterative } from "./magic_math_iterative.ts";
+import { magicMathIterative } from "../../src/algorithms/magic_math_iterative.ts";
 
 Deno.test("magicMathIterative - Base Cases", () => {
   // Test base cases

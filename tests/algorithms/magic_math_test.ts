@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { magicMath } from "./magic_math.ts";
+import { magicMath } from "../../src/algorithms/magic_math.ts";
 
 Deno.test("magicMath - Base Cases", () => {
   // Test base cases

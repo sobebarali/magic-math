@@ -1,10 +1,11 @@
 {
   "tasks": {
     "dev": "deno run --watch --allow-net --allow-env --allow-read main.ts",
-    "test": "deno test --allow-net --allow-env",
-    "benchmark": "deno run --allow-net --allow-env benchmark.ts",
-    "benchmark:large": "deno run --allow-net --allow-env benchmark.ts 500 3",
-    "test:iterative": "deno test magic_math_iterative_test.ts"
+    "test": "deno test --allow-net --allow-env tests/",
+    "test:algorithms": "deno test tests/algorithms/",
+    "test:api": "deno test tests/api/",
+    "benchmark": "deno run --allow-net --allow-env benchmarks/benchmark.ts",
+    "benchmark:large": "deno run --allow-net --allow-env benchmarks/benchmark.ts 500 3"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"

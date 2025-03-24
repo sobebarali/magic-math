@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magic Math Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f7fa;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #result {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .result-area {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .error {
+      color: #e74c3c;
+      font-weight: 600;
+    }
+    .visualization {
+      margin-top: 30px;
+    }
+    .sequence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .sequence-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f7ff;
+      border-radius: 4px;
+      padding: 10px;
+      min-width: 60px;
+    }
+    .sequence-value {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .sequence-index {
+      font-size: 12px;
+      color: #666;
+    }
+    .formula {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #edf5ff;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Magic Math Calculator</h1>
+  
+  <div class="card">
+    <div class="input-group">
+      <label for="number">Enter a non-negative integer:</label>
+      <input type="number" id="number" min="0" step="1" value="5">
+    </div>
+    <button id="calculate">Calculate</button>
+    
+    <div class="result-area">
+      <div>Result: <span id="result">-</span></div>
+      <div id="error" class="error"></div>
+    </div>
+  </div>
+  
+  <div class="card formula">
+    <h3>Magic Math Formula:</h3>
+    <p>magic_math(0) = 0</p>
+    <p>magic_math(1) = 1</p>
+    <p>magic_math(N) = magic_math(N−1) + magic_math(N−2) + N</p>
+  </div>
+  
+  <div class="card visualization">
+    <h3>Sequence Visualization:</h3>
+    <div class="sequence" id="sequence"></div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const calculateBtn = document.getElementById('calculate');
+      const numberInput = document.getElementById('number');
+      const resultElement = document.getElementById('result');
+      const errorElement = document.getElementById('error');
+      const sequenceElement = document.getElementById('sequence');
+      
+      // Get server base URL (handling both direct and Docker deployment)
+      function getBaseUrl() {
+        const hostname = window.location.hostname;
+        const port = window.location.port || 
+                    (window.location.protocol === 'https:' ? 443 : 80);
+        
+        return `${window.location.protocol}//${hostname}:${port}`;
+      }
+      
+      // Calculate magic math for a number
+      async function calculateMagicMath(number) {
+        try {
+          errorElement.textContent = '';
+          const response = await fetch(`${getBaseUrl()}/${number}`);
+          const data = await response.json();
+          
+          if (response.ok) {
+            resultElement.textContent = data.result;
+            visualizeSequence(number, data.result);
+            return data.result;
+          } else {
+            errorElement.textContent = data.error || 'An error occurred';
+            return null;
+          }
+        } catch (error) {
+          errorElement.textContent = 'Error connecting to the server';
+          console.error('Error:', error);
+          return null;
+        }
+      }
+      
+      // Visualize the sequence
+      async function visualizeSequence(n, result) {
+        sequenceElement.innerHTML = '';
+        
+        const sequence = [];
+        for (let i = 0; i <= n; i++) {
+          try {
+            const response = await fetch(`${getBaseUrl()}/${i}`);
+            if (response.ok) {
+              const data = await response.json();
+              sequence.push({ index: i, value: data.result });
+            }
+          } catch (error) {
+            console.error('Error fetching value for', i, error);
+          }
+        }
+        
+        sequence.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.className = 'sequence-item';
+          
+          const valueElement = document.createElement('div');
+          valueElement.className = 'sequence-value';
+          valueElement.textContent = item.value;
+          
+          const indexElement = document.createElement('div');
+          indexElement.className = 'sequence-index';
+          indexElement.textContent = `n=${item.index}`;
+          
+          itemElement.appendChild(valueElement);
+          itemElement.appendChild(indexElement);
+          sequenceElement.appendChild(itemElement);
+        });
+      }
+      
+      // Event listeners
+      calculateBtn.addEventListener('click', () => {
+        const number = parseInt(numberInput.value, 10);
+        if (Number.isInteger(number) && number >= 0) {
+          calculateMagicMath(number);
+        } else {
+          errorElement.textContent = 'Please enter a valid non-negative integer';
+          resultElement.textContent = '-';
+        }
+      });
+      
+      // Initialize with default value
+      calculateMagicMath(5);
+    });
+  </script>
+</body>
+</html> 
