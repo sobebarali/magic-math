@@ -8,6 +8,6 @@ export const magicMath = (n: number): number => {
   if (n === 0) return 0;
   if (n === 1) return 1;
   
-  // For now, we're only implementing the base cases
-  throw new Error("Not implemented for values > 1");
+  // Recursive case: magicMath(N) = magicMath(N−1) + magicMath(N−2) + N
+  return magicMath(n - 1) + magicMath(n - 2) + n;
 }; 
