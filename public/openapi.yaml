@@ -1,0 +1,337 @@
+openapi: 3.0.3
+info:
+  title: Magic Math API
+  description: |
+    A simple REST API that calculates Magic Math values, where:
+    - magic_math(0) = 0
+    - magic_math(1) = 1
+    - magic_math(N) = magic_math(N−1) + magic_math(N−2) + N
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+servers:
+  - url: 'http://localhost:5000'
+    description: Local development server
+  - url: 'http://localhost:8080'
+    description: Docker development server
+  - url: 'https://api.example.com'
+    description: Production server
+
+tags:
+  - name: calculation
+    description: Magic Math calculations
+  - name: batch
+    description: Batch operations
+  - name: system
+    description: System operations
+
+paths:
+  '/{number}':
+    get:
+      tags:
+        - calculation
+      summary: Calculate Magic Math value
+      description: Returns the magic math value for a given non-negative integer
+      parameters:
+        - name: number
+          in: path
+          description: The non-negative integer to calculate
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful calculation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicMathResult'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  '/api/v1/{number}':
+    get:
+      tags:
+        - calculation
+      summary: Calculate Magic Math value (versioned API)
+      description: Returns the magic math value for a given non-negative integer using the versioned API
+      parameters:
+        - name: number
+          in: path
+          description: The non-negative integer to calculate
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful calculation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicMathResult'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  '/batch':
+    post:
+      tags:
+        - batch
+      summary: Batch calculate Magic Math values
+      description: Calculate multiple Magic Math values in a single request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+              properties:
+                inputs:
+                  type: array
+                  items:
+                    type: integer
+                  example: [0, 1, 2, 3, 4, 5]
+      responses:
+        '200':
+          description: Successful batch calculation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/MagicMathResult'
+                        - $ref: '#/components/schemas/BatchItemError'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  '/api/v1/batch':
+    post:
+      tags:
+        - batch
+      summary: Batch calculate Magic Math values (versioned API)
+      description: Calculate multiple Magic Math values in a single request using the versioned API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+              properties:
+                inputs:
+                  type: array
+                  items:
+                    type: integer
+                  example: [0, 1, 2, 3, 4, 5]
+      responses:
+        '200':
+          description: Successful batch calculation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/MagicMathResult'
+                        - $ref: '#/components/schemas/BatchItemError'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  '/benchmark':
+    get:
+      tags:
+        - system
+      summary: Get benchmark data
+      description: Returns performance comparison data between recursive and iterative implementations
+      responses:
+        '200':
+          description: Benchmark data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenchmarkData'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  '/health':
+    get:
+      tags:
+        - system
+      summary: Health check
+      description: Check the health status of the API
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+components:
+  schemas:
+    MagicMathResult:
+      type: object
+      required:
+        - input
+        - result
+        - algorithm
+      properties:
+        input:
+          type: integer
+          example: 5
+        result:
+          type: integer
+          example: 26
+        algorithm:
+          type: string
+          enum: [recursive, iterative]
+          example: recursive
+        cache:
+          type: string
+          enum: [hit, miss]
+          example: miss
+
+    BatchItemError:
+      type: object
+      required:
+        - input
+        - error
+      properties:
+        input:
+          type: integer
+          example: -1
+        error:
+          type: string
+          example: Input must be a non-negative integer
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Input must be a non-negative integer
+
+    RateLimitError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: Too many requests. Please try again later.
+        documentation:
+          type: string
+          example: See X-RateLimit-* headers for details
+
+    BenchmarkData:
+      type: object
+      required:
+        - message
+        - tests
+      properties:
+        message:
+          type: string
+          example: Magic Math Benchmark
+        tests:
+          type: array
+          items:
+            type: object
+            properties:
+              n:
+                type: integer
+                example: 10
+              recursive:
+                type: string
+                example: 0.1ms
+              iterative:
+                type: string
+                example: 0.2ms
+              winner:
+                type: string
+                example: recursive
+
+    HealthStatus:
+      type: object
+      required:
+        - status
+        - timestamp
+        - uptime
+      properties:
+        status:
+          type: string
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+          example: 2023-04-01T12:00:00Z
+        uptime:
+          type: number
+          example: 3600000
+        cache:
+          type: string
+          enum: [connected, disconnected]
+          example: connected 

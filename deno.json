@@ -8,6 +8,7 @@
     "benchmark:large": "deno run --allow-net --allow-env benchmarks/benchmark.ts 500 3"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1"
+    "@std/assert": "jsr:@std/assert@1",
+    "redis": "npm:redis@^4.7.0"
   }
 } 

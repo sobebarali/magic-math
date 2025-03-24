@@ -100,6 +100,23 @@
       border-radius: 4px;
       font-family: monospace;
     }
+    .api-docs {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .api-docs a {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #27ae60;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    .api-docs a:hover {
+      background-color: #219653;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +145,10 @@
   <div class="card visualization">
     <h3>Sequence Visualization:</h3>
     <div class="sequence" id="sequence"></div>
+  </div>
+  
+  <div class="api-docs">
+    <a href="/swagger/index.html" target="_blank">API Documentation</a>
   </div>
   
   <script>

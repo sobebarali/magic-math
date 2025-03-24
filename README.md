@@ -16,6 +16,13 @@ A simple REST API that calculates Magic Math values. Magic Math is defined as:
 - **Performance Benchmarking** to compare algorithm efficiency
 - **Automatic Port Selection** if default port is busy
 - **Docker/Docker Compose Support** for easy deployment
+- **Batch Processing** for calculating multiple values in a single request
+- **Redis Caching** for improved performance on frequently requested values
+- **Rate Limiting** to prevent abuse
+- **API Versioning** for future compatibility
+- **OpenAPI/Swagger Documentation** for easy API exploration
+- **CI/CD Pipeline** with GitHub Actions for automated testing and deployment
+- **Health Check Endpoints** for monitoring
 
 ## Prerequisites
 
@@ -123,6 +130,75 @@ Response:
 }
 ```
 
+### Batch Processing
+
+```
+POST /batch
+```
+
+Request body:
+
+```json
+{
+  "inputs": [0, 1, 2, 3, 4, 5]
+}
+```
+
+Example:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"inputs":[0,1,2,3,4,5]}' http://127.0.0.1:5000/batch
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {"input": 0, "result": 0, "algorithm": "recursive"},
+    {"input": 1, "result": 1, "algorithm": "recursive"},
+    {"input": 2, "result": 3, "algorithm": "recursive"},
+    {"input": 3, "result": 7, "algorithm": "recursive"},
+    {"input": 4, "result": 14, "algorithm": "recursive"},
+    {"input": 5, "result": 26, "algorithm": "recursive"}
+  ]
+}
+```
+
+### Health Check
+
+```
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2023-12-01T12:34:56.789Z",
+  "uptime": 3600000,
+  "cache": "connected"
+}
+```
+
+### API Documentation
+
+Swagger UI is available at:
+
+```
+http://127.0.0.1:5000/swagger/index.html
+```
+
+### Versioned API
+
+All endpoints are also available with versioning:
+
+```
+GET /api/v1/:number
+POST /api/v1/batch
+```
+
 ### Benchmark Data
 
 ```
@@ -147,6 +223,32 @@ Response:
 {
   "error": "Input must be a non-negative integer"
 }
+```
+
+## Advanced Configuration
+
+### Redis Caching
+
+Enable Redis caching by setting the following environment variables:
+
+```bash
+# Redis connection URL
+REDIS_URL=redis://localhost:6379
+
+# Cache TTL in seconds (default: 3600)
+CACHE_TTL=3600
+```
+
+### Rate Limiting
+
+Configure rate limiting with these environment variables:
+
+```bash
+# Maximum requests per window
+RATE_LIMIT_MAX=100
+
+# Rate limit window in milliseconds (default: 60000 - 1 minute)
+RATE_LIMIT_WINDOW=60000
 ```
 
 ## Port Configuration

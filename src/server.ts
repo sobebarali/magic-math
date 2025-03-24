@@ -1,10 +1,25 @@
 import { serve } from "https://deno.land/std@0.216.0/http/server.ts";
 import { createHandler } from "./api/index.ts";
+import { initRedisClient, closeRedisClient } from "./utils/redis_client.ts";
 
 /**
  * Starts the server on the specified port, with automatic fallback if port is in use
  */
 export const startServer = async (initialPort: number): Promise<void> => {
+  // Initialize Redis client
+  try {
+    await initRedisClient();
+  } catch (error: unknown) {
+    console.warn("Redis initialization failed, continuing without caching:", error);
+  }
+
+  // Register shutdown handler to close Redis connection
+  Deno.addSignalListener("SIGINT", async () => {
+    console.log("Shutting down gracefully...");
+    await closeRedisClient();
+    Deno.exit(0);
+  });
+
   const handler = createHandler();
   let port = initialPort;
   const MAX_PORT_ATTEMPTS = 10;
@@ -22,10 +37,12 @@ export const startServer = async (initialPort: number): Promise<void> => {
         port++;
       } else {
         // For other errors, just throw them
+        await closeRedisClient(); // Close Redis connection on error
         throw error;
       }
     }
   }
   
+  await closeRedisClient(); // Close Redis connection if we couldn't start the server
   throw new Error(`Could not find an available port after ${MAX_PORT_ATTEMPTS} attempts.`);
 }; 

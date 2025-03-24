@@ -10,6 +10,10 @@ services:
       - "8080:5000"
     environment:
       - PORT=5000
+      - REDIS_URL=redis://redis:6379
+      - CACHE_TTL=3600
+      - RATE_LIMIT_MAX=100
+      - RATE_LIMIT_WINDOW=60000
     restart: unless-stopped
     volumes:
       - ./src:/app/src
@@ -18,7 +22,21 @@ services:
       - ./deno.json:/app/deno.json
       - deno-cache:/deno-dir/deps
     command: ["run", "--allow-net", "--allow-env", "--allow-read", "--watch", "main.ts"]
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: magic-math-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
 
 volumes:
   deno-cache:
-    name: deno-cache 
+    name: deno-cache
+  redis-data:
+    name: redis-data 
