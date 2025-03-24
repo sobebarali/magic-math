@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  magic-math-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: magic-math-api
+    ports:
+      - "8080:5000"
+    environment:
+      - PORT=5000
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - deno-cache:/deno-dir/deps
+    command: ["run", "--allow-net", "--allow-env", "--watch", "main.ts"]
+
+volumes:
+  deno-cache:
+    name: deno-cache 
