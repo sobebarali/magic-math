@@ -5,6 +5,12 @@
  * magic_math(N) = magic_math(N−1) + magic_math(N−2) + N
  */
 export const magicMath = (n: number): number => {
+  // Input validation
+  if (n < 0 || !Number.isInteger(n) || Number.isNaN(n)) {
+    throw new Error("Input must be a non-negative integer");
+  }
+
+  // Base cases
   if (n === 0) return 0;
   if (n === 1) return 1;
   
