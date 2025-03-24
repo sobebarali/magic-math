@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals, assertThrows } from "@std/assert";
 import { magicMath } from "./magic_math.ts";
 
 Deno.test("magicMath - Base Cases", () => {
@@ -19,4 +19,30 @@ Deno.test("magicMath - Recursive Cases", () => {
   
   // For N=5: magicMath(4) + magicMath(3) + 5 = 14 + 7 + 5 = 26
   assertEquals(magicMath(5), 26, "magicMath(5) should return 26");
+});
+
+Deno.test("magicMath - Input Validation", () => {
+  // Test negative numbers
+  assertThrows(
+    () => magicMath(-1),
+    Error,
+    "Input must be a non-negative integer",
+    "Should throw for negative numbers"
+  );
+  
+  // Test non-integer values
+  assertThrows(
+    () => magicMath(1.5),
+    Error,
+    "Input must be a non-negative integer",
+    "Should throw for non-integer values"
+  );
+  
+  // Test NaN
+  assertThrows(
+    () => magicMath(NaN),
+    Error,
+    "Input must be a non-negative integer",
+    "Should throw for NaN"
+  );
 }); 
