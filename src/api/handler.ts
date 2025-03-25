@@ -76,27 +76,27 @@ async function handleRequest(request: Request, rateLimitHeaders: Record<string, 
 
   // Handle benchmark data endpoint
   if (path === "/benchmark") {
-    return await addHeaders(handleBenchmarkData(), rateLimitHeaders);
+    return addHeaders(handleBenchmarkData(), rateLimitHeaders);
   }
   
   // Handle batch calculations
   if (path === "/batch" && request.method === "POST") {
-    return await addHeaders(await handleBatchCalculations(request), rateLimitHeaders);
+    return addHeaders(await handleBatchCalculations(request), rateLimitHeaders);
   }
 
   // Handle health check endpoint
   if (path === "/health") {
-    return await addHeaders(handleHealthCheck(), rateLimitHeaders);
+    return addHeaders(handleHealthCheck(), rateLimitHeaders);
   }
 
   // Handle magic math calculation
   const match = path.match(/^\/(-?\d+)$/);
   if (match) {
-    return await addHeaders(await handleMagicMathCalculation(match), rateLimitHeaders);
+    return addHeaders(await handleMagicMathCalculation(match), rateLimitHeaders);
   }
 
   // Handle invalid path
-  return await addHeaders(
+  return addHeaders(
     new Response(
       JSON.stringify({ error: "Invalid path. Use /:number format." }),
       {
@@ -111,7 +111,7 @@ async function handleRequest(request: Request, rateLimitHeaders: Record<string, 
 /**
  * Add rate limit headers to response
  */
-async function addHeaders(response: Response, headers: Record<string, string>): Promise<Response> {
+function addHeaders(response: Response, headers: Record<string, string>): Response {
   const newResponse = new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
