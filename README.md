@@ -55,36 +55,48 @@ deno task dev
 Build and run the Docker container:
 
 ```bash
+# Build the Docker image
 docker build -t magic-math-api .
-docker run -p 5000:5000 magic-math-api
+
+# Run the container with Redis disabled
+docker run -p 5001:5000 -e REDIS_URL="" magic-math-api
+
+# Or with a specific port
+docker run -p 8080:5000 -e PORT=5000 -e REDIS_URL="" magic-math-api
 ```
 
-### Using Docker Compose
+> **Note**: Port 5000 may already be in use on some systems. You can use a different port like 5001 as shown above.
 
-Start the application with Docker Compose:
+### Using Docker Compose (Recommended)
+
+The recommended way to run the application is with Docker Compose, which automatically sets up both the API and Redis server:
 
 ```bash
+# Start the application with Docker Compose
 docker-compose up
+
+# Or run it in detached mode
+docker-compose up -d
 ```
 
-Or run it in detached mode:
+By default, the application will be accessible at `http://localhost:5001/` as configured in the `docker-compose.yml` file.
+
+To stop the services:
 
 ```bash
-docker-compose up -d
+# Stop the containers but preserve data
+docker-compose down
+
+# Stop the containers and remove volumes (clears Redis data)
+docker-compose down -v
 ```
 
 ## Web UI
 
 The application includes a web interface accessible at the root URL:
 
-```json
-http://127.0.0.1:5000/
 ```
-
-or if using Docker:
-
-```json
-http://127.0.0.1:5000/
+http://localhost:5001/
 ```
 
 The UI allows you to:
@@ -97,14 +109,14 @@ The UI allows you to:
 
 ### Calculate Magic Math
 
-```json
+```
 GET /:number
 ```
 
 Example:
 
 ```bash
-curl http://127.0.0.1:5000/5
+curl http://localhost:5001/5
 ```
 
 Response:
@@ -113,7 +125,8 @@ Response:
 {
   "input": 5,
   "result": 26,
-  "algorithm": "recursive"
+  "algorithm": "recursive",
+  "cache": "miss"
 }
 ```
 
@@ -121,7 +134,7 @@ For large inputs (n >= 1000), the API automatically switches to the iterative
 algorithm:
 
 ```bash
-curl http://127.0.0.1:5000/1000
+curl http://localhost:5001/1000
 ```
 
 Response:
@@ -130,13 +143,14 @@ Response:
 {
   "input": 1000,
   "result": 1116779790,
-  "algorithm": "iterative"
+  "algorithm": "iterative",
+  "cache": "miss"
 }
 ```
 
 ### Batch Processing
 
-```json
+```
 POST /batch
 ```
 
@@ -151,7 +165,7 @@ Request body:
 Example:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"inputs":[0,1,2,3,4,5]}' http://127.0.0.1:5000/batch
+curl -X POST -H "Content-Type: application/json" -d '{"inputs":[0,1,2,3,4,5]}' http://localhost:5001/batch
 ```
 
 Response:
@@ -159,19 +173,19 @@ Response:
 ```json
 {
   "results": [
-    { "input": 0, "result": 0, "algorithm": "recursive" },
-    { "input": 1, "result": 1, "algorithm": "recursive" },
-    { "input": 2, "result": 3, "algorithm": "recursive" },
-    { "input": 3, "result": 7, "algorithm": "recursive" },
-    { "input": 4, "result": 14, "algorithm": "recursive" },
-    { "input": 5, "result": 26, "algorithm": "recursive" }
+    { "input": 0, "result": 0, "algorithm": "recursive", "cache": "miss" },
+    { "input": 1, "result": 1, "algorithm": "recursive", "cache": "miss" },
+    { "input": 2, "result": 3, "algorithm": "recursive", "cache": "miss" },
+    { "input": 3, "result": 7, "algorithm": "recursive", "cache": "miss" },
+    { "input": 4, "result": 14, "algorithm": "recursive", "cache": "miss" },
+    { "input": 5, "result": 26, "algorithm": "recursive", "cache": "miss" }
   ]
 }
 ```
 
 ### Health Check
 
-```json
+```
 GET /health
 ```
 
@@ -190,22 +204,28 @@ Response:
 
 Swagger UI is available at:
 
-```json
-http://127.0.0.1:5000/swagger/index.html
+```
+http://localhost:5001/swagger/index.html
 ```
 
 ### Versioned API
 
 All endpoints are also available with versioning:
 
-```json
+```
 GET /api/v1/:number
 POST /api/v1/batch
 ```
 
+Example:
+
+```bash
+curl http://localhost:5001/api/v1/5
+```
+
 ### Benchmark Data
 
-```json
+```
 GET /benchmark
 ```
 
@@ -219,7 +239,7 @@ The API will return a 400 error for negative or non-integer inputs.
 Example:
 
 ```bash
-curl http://127.0.0.1:5000/-1
+curl http://localhost:5001/-1
 ```
 
 Response:
@@ -234,7 +254,9 @@ Response:
 
 ### Redis Caching
 
-Enable Redis caching by setting the following environment variables:
+The application is configured to use Redis for caching when available. When using Docker Compose, Redis is automatically set up and connected.
+
+If you're running the application without Docker Compose, you can enable Redis caching by setting the following environment variables:
 
 ```bash
 # Redis connection URL
@@ -243,6 +265,24 @@ REDIS_URL=redis://localhost:6379
 # Cache TTL in seconds (default: 3600)
 CACHE_TTL=3600
 ```
+
+To disable Redis completely (use in-memory caching only):
+
+```bash
+# With Deno
+REDIS_URL="" deno run --allow-net --allow-env --allow-read main.ts
+
+# With Docker
+docker run -p 5001:5000 -e REDIS_URL="" magic-math-api
+```
+
+With Docker Compose, Redis is already configured and will be used automatically. To check if Redis is connected, access the health endpoint:
+
+```bash
+curl http://localhost:5001/health
+```
+
+If Redis is connected, you'll see `"cache": "connected"` in the response.
 
 ### Rate Limiting
 
@@ -274,7 +314,7 @@ X-RateLimit-Backend: redis
 
 ## Port Configuration
 
-The server will start at <http://127.0.0.1:5000> by default. If port 5000 is
+The server will start at `http://localhost:5000` by default. If port 5000 is
 already in use, the application will automatically try the next available port
 (5001, 5002, etc.).
 
@@ -287,8 +327,15 @@ PORT=8080 deno run --allow-net --allow-env --allow-read main.ts
 # With Docker
 docker run -p 8080:8080 -e PORT=8080 magic-math-api
 
-# With Docker Compose (edit the PORT in docker-compose.yml)
+# With Docker Compose
+# Edit the ports section in docker-compose.yml:
+# ports:
+#   - "8080:5000"
+# And then run:
+docker-compose up -d
 ```
+
+> **Note**: In the current configuration, the Docker Compose setup uses port 5001 on the host machine to avoid conflicts with port 5000, which is commonly used by other services.
 
 ## Running Tests
 
@@ -373,4 +420,67 @@ To lint your code:
 
 ```bash
 deno lint
+```
+
+## Troubleshooting
+
+### Port Already in Use
+
+If you see an error like `Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:5000 -> 0.0.0.0:0: listen tcp 0.0.0.0:5000: bind: address already in use`, you can:
+
+1. Change the port mapping in docker-compose.yml:
+   ```yml
+   ports:
+     - "5001:5000"  # Use port 5001 on host instead of 5000
+   ```
+
+2. Or stop the process using port 5000:
+   ```bash
+   # Find process using port 5000
+   lsof -i :5000
+   
+   # Kill the process
+   kill -9 [PID]
+   ```
+
+### Redis Connection Issues
+
+If you see Redis connection errors but the application is still working, this is normal behavior when Redis is not available. The application will fall back to in-memory caching.
+
+To ensure Redis is running properly with Docker Compose:
+
+```bash
+# Check Redis container status
+docker ps | grep redis
+
+# View Redis logs
+docker logs magic-math-redis
+```
+
+### Platform Warning in Docker
+
+If you see a warning like `The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8)`, you can:
+
+1. Specify the platform when building:
+   ```bash
+   docker build --platform linux/arm64 -t magic-math-api .
+   ```
+
+2. Or modify the Dockerfile to use a platform-specific image:
+   ```dockerfile
+   FROM --platform=linux/arm64 denoland/deno:1.37.0
+   ```
+
+This warning typically appears when running on Apple Silicon (M1/M2/M3) Macs but doesn't affect functionality in most cases.
+
+### For Developers: Working with Deno npm Dependencies
+
+The project uses Redis from npm. If you need to add or update npm dependencies:
+
+```bash
+# Cache the npm dependency (don't use 'deno add')
+deno cache --reload npm:redis@4.7.0
+
+# Import in your code
+import { createClient } from "npm:redis@4.7.0";
 ```
