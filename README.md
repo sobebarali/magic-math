@@ -27,10 +27,12 @@ A simple REST API that calculates Magic Math values. Magic Math is defined as:
 ## Prerequisites
 
 - [Deno](https://deno.com/) runtime (version 1.36.0 or later)
-  
+
   OR
-  
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) for containerized deployment
+
+- [Docker](https://www.docker.com/) and
+  [Docker Compose](https://docs.docker.com/compose/) for containerized
+  deployment
 
 ## Running the Application
 
@@ -115,7 +117,8 @@ Response:
 }
 ```
 
-For large inputs (n >= 1000), the API automatically switches to the iterative algorithm:
+For large inputs (n >= 1000), the API automatically switches to the iterative
+algorithm:
 
 ```bash
 curl http://127.0.0.1:5000/1000
@@ -156,12 +159,12 @@ Response:
 ```json
 {
   "results": [
-    {"input": 0, "result": 0, "algorithm": "recursive"},
-    {"input": 1, "result": 1, "algorithm": "recursive"},
-    {"input": 2, "result": 3, "algorithm": "recursive"},
-    {"input": 3, "result": 7, "algorithm": "recursive"},
-    {"input": 4, "result": 14, "algorithm": "recursive"},
-    {"input": 5, "result": 26, "algorithm": "recursive"}
+    { "input": 0, "result": 0, "algorithm": "recursive" },
+    { "input": 1, "result": 1, "algorithm": "recursive" },
+    { "input": 2, "result": 3, "algorithm": "recursive" },
+    { "input": 3, "result": 7, "algorithm": "recursive" },
+    { "input": 4, "result": 14, "algorithm": "recursive" },
+    { "input": 5, "result": 26, "algorithm": "recursive" }
   ]
 }
 ```
@@ -206,7 +209,8 @@ POST /api/v1/batch
 GET /benchmark
 ```
 
-Returns performance comparison data between recursive and iterative implementations.
+Returns performance comparison data between recursive and iterative
+implementations.
 
 ### Invalid Input Handling
 
@@ -252,7 +256,8 @@ RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW=60000
 ```
 
-The rate limiter automatically uses Redis when available, with the following benefits:
+The rate limiter automatically uses Redis when available, with the following
+benefits:
 
 - Distributed rate limiting across multiple API instances
 - Persistence across server restarts
@@ -269,7 +274,9 @@ X-RateLimit-Backend: redis
 
 ## Port Configuration
 
-The server will start at <http://127.0.0.1:5000> by default. If port 5000 is already in use, the application will automatically try the next available port (5001, 5002, etc.).
+The server will start at <http://127.0.0.1:5000> by default. If port 5000 is
+already in use, the application will automatically try the next available port
+(5001, 5002, etc.).
 
 You can specify a custom port by setting the `PORT` environment variable:
 
@@ -323,3 +330,46 @@ deno run --allow-net --allow-env benchmark.ts 100 10
 - For values ≥ 1000, the API automatically uses the iterative implementation
 - The server automatically tries alternative ports if the default one is in use
 - Docker deployment includes hot-reloading for development
+
+## Development Workflow
+
+### Git Hooks
+
+This project uses custom Git hooks for Deno, similar to Husky in Node.js projects. These hooks ensure code quality and consistency:
+
+- **Pre-commit Hook**: Automatically runs formatting and linting on staged files
+- **Post-merge Hook**: Refreshes dependencies when package configuration changes
+
+#### Installing Hooks
+
+Hooks are automatically installed when you run:
+
+```bash
+deno task hooks:install
+```
+
+#### Bypassing Hooks
+
+If needed, you can bypass hooks using the `--no-verify` flag:
+
+```bash
+git commit -m "Your commit message" --no-verify
+```
+
+For more details, see the [hooks documentation](hooks/README.md).
+
+### Code Formatting
+
+To format your code:
+
+```bash
+deno fmt
+```
+
+### Linting
+
+To lint your code:
+
+```bash
+deno lint
+```
