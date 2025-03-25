@@ -12,7 +12,7 @@
     "prepare": "deno task hooks:install"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1",
+    "@std/assert": "jsr:@std/assert@^1.0.12",
     "redis": "npm:redis@^4.7.0"
   }
 }
