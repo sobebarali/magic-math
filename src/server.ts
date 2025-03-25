@@ -4,6 +4,9 @@ import { initRedisClient, closeRedisClient } from "./utils/redis_client.ts";
 import { createRequestLoggerMiddleware } from "./utils/middleware.ts";
 import { logger } from "./utils/logger.ts";
 
+// Track shutdown state
+let isShuttingDown = false;
+
 /**
  * Starts the server on the specified port, with automatic fallback if port is in use
  */
@@ -17,8 +20,20 @@ export const startServer = async (initialPort: number): Promise<void> => {
 
   // Register shutdown handler to close Redis connection
   Deno.addSignalListener("SIGINT", async () => {
+    // Prevent multiple shutdown attempts
+    if (isShuttingDown) {
+      return;
+    }
+    
+    isShuttingDown = true;
     logger.info("Shutting down gracefully...");
-    await closeRedisClient();
+    
+    try {
+      await closeRedisClient();
+    } catch (error) {
+      logger.error("Error during shutdown", { error });
+    }
+    
     Deno.exit(0);
   });
 
