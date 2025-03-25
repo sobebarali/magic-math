@@ -16,6 +16,13 @@ A simple REST API that calculates Magic Math values. Magic Math is defined as:
 - **Performance Benchmarking** to compare algorithm efficiency
 - **Automatic Port Selection** if default port is busy
 - **Docker/Docker Compose Support** for easy deployment
+- **Batch Processing** for calculating multiple values in a single request
+- **Redis Caching** for improved performance on frequently requested values
+- **Rate Limiting** to prevent abuse
+- **API Versioning** for future compatibility
+- **OpenAPI/Swagger Documentation** for easy API exploration
+- **CI/CD Pipeline** with GitHub Actions for automated testing and deployment
+- **Health Check Endpoints** for monitoring
 
 ## Prerequisites
 
@@ -68,17 +75,18 @@ docker-compose up -d
 
 The application includes a web interface accessible at the root URL:
 
-```
+```json
 http://127.0.0.1:5000/
 ```
 
 or if using Docker:
 
-```
+```json
 http://127.0.0.1:8080/
 ```
 
 The UI allows you to:
+
 - Enter any non-negative integer
 - See the calculated Magic Math result
 - Visualize the entire Magic Math sequence up to your input
@@ -87,7 +95,7 @@ The UI allows you to:
 
 ### Calculate Magic Math
 
-```
+```json
 GET /:number
 ```
 
@@ -123,9 +131,78 @@ Response:
 }
 ```
 
+### Batch Processing
+
+```json
+POST /batch
+```
+
+Request body:
+
+```json
+{
+  "inputs": [0, 1, 2, 3, 4, 5]
+}
+```
+
+Example:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"inputs":[0,1,2,3,4,5]}' http://127.0.0.1:5000/batch
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {"input": 0, "result": 0, "algorithm": "recursive"},
+    {"input": 1, "result": 1, "algorithm": "recursive"},
+    {"input": 2, "result": 3, "algorithm": "recursive"},
+    {"input": 3, "result": 7, "algorithm": "recursive"},
+    {"input": 4, "result": 14, "algorithm": "recursive"},
+    {"input": 5, "result": 26, "algorithm": "recursive"}
+  ]
+}
+```
+
+### Health Check
+
+```json
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2023-12-01T12:34:56.789Z",
+  "uptime": 3600000,
+  "cache": "connected"
+}
+```
+
+### API Documentation
+
+Swagger UI is available at:
+
+```json
+http://127.0.0.1:5000/swagger/index.html
+```
+
+### Versioned API
+
+All endpoints are also available with versioning:
+
+```json
+GET /api/v1/:number
+POST /api/v1/batch
+```
+
 ### Benchmark Data
 
-```
+```json
 GET /benchmark
 ```
 
@@ -149,9 +226,50 @@ Response:
 }
 ```
 
+## Advanced Configuration
+
+### Redis Caching
+
+Enable Redis caching by setting the following environment variables:
+
+```bash
+# Redis connection URL
+REDIS_URL=redis://localhost:6379
+
+# Cache TTL in seconds (default: 3600)
+CACHE_TTL=3600
+```
+
+### Rate Limiting
+
+The API includes robust rate limiting with Redis support:
+
+```bash
+# Maximum requests per window
+RATE_LIMIT_MAX=100
+
+# Rate limit window in milliseconds (default: 60000 - 1 minute)
+RATE_LIMIT_WINDOW=60000
+```
+
+The rate limiter automatically uses Redis when available, with the following benefits:
+
+- Distributed rate limiting across multiple API instances
+- Persistence across server restarts
+- Automatic fallback to in-memory rate limiting if Redis is unavailable
+
+Rate limit headers are included in all responses:
+
+```json
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 99
+X-RateLimit-Reset: 1631234567
+X-RateLimit-Backend: redis
+```
+
 ## Port Configuration
 
-The server will start at http://127.0.0.1:5000 by default. If port 5000 is already in use, the application will automatically try the next available port (5001, 5002, etc.).
+The server will start at <http://127.0.0.1:5000> by default. If port 5000 is already in use, the application will automatically try the next available port (5001, 5002, etc.).
 
 You can specify a custom port by setting the `PORT` environment variable:
 
@@ -203,5 +321,5 @@ deno run --allow-net --allow-env benchmark.ts 100 10
 - The recursive implementation uses memoization to avoid redundant calculations
 - The iterative implementation avoids stack overflow for large inputs
 - For values ≥ 1000, the API automatically uses the iterative implementation
-- The server automatically tries alternative ports if the default one is in use 
-- Docker deployment includes hot-reloading for development 
+- The server automatically tries alternative ports if the default one is in use
+- Docker deployment includes hot-reloading for development
