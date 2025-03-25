@@ -1,4 +1,5 @@
 import { createClient } from "npm:redis@4.7.0";
+import type { RedisClientType } from "npm:redis@4.7.0";
 
 /**
  * Redis client configuration
@@ -25,15 +26,22 @@ export const initRedisClient = async (): Promise<void> => {
     });
 
     // Handle connection events
-    redisClient.on("error", (err) => {
-      console.error("Redis client error:", err);
-      isConnected = false;
-    });
+    // Using type assertion to handle the event emitter methods
+    (redisClient as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void }).on(
+      "error", 
+      (err: unknown) => {
+        console.error("Redis client error:", err);
+        isConnected = false;
+      }
+    );
 
-    redisClient.on("connect", () => {
-      console.log("Redis client connected");
-      isConnected = true;
-    });
+    (redisClient as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void }).on(
+      "connect", 
+      () => {
+        console.log("Redis client connected");
+        isConnected = true;
+      }
+    );
 
     await redisClient.connect();
   } catch (error: unknown) {

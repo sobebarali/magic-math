@@ -2,8 +2,8 @@
   "tasks": {
     "dev": "deno run --watch --allow-net --allow-env --allow-read main.ts",
     "test": "deno test --allow-net --allow-env tests/",
-    "test:algorithms": "deno test tests/algorithms/",
-    "test:api": "deno test tests/api/",
+    "test:algorithms": "deno test --allow-env tests/algorithms/",
+    "test:api": "deno test --allow-net --allow-env tests/api/",
     "benchmark": "deno run --allow-net --allow-env benchmarks/benchmark.ts",
     "benchmark:large": "deno run --allow-net --allow-env benchmarks/benchmark.ts 500 3"
   },
