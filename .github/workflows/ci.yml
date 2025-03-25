@@ -18,10 +18,10 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.37.x
-          
+
       - name: Upgrade Deno to latest version
         run: deno upgrade
-          
+
       - name: Cache dependencies
         run: deno cache --reload main.ts
 
