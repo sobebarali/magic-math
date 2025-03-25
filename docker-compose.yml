@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   magic-math-api:
@@ -21,7 +21,14 @@ services:
       - ./main.ts:/app/main.ts
       - ./deno.json:/app/deno.json
       - deno-cache:/deno-dir/deps
-    command: ["run", "--allow-net", "--allow-env", "--allow-read", "--watch", "main.ts"]
+    command: [
+      "run",
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--watch",
+      "main.ts",
+    ]
     depends_on:
       - redis
 
@@ -39,4 +46,4 @@ volumes:
   deno-cache:
     name: deno-cache
   redis-data:
-    name: redis-data 
+    name: redis-data

@@ -30,20 +30,24 @@ export const initRedisClient = async (): Promise<void> => {
 
     // Handle connection events
     // Using type assertion to handle the event emitter methods
-    (redisClient as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void }).on(
-      "error", 
+    (redisClient as unknown as {
+      on: (event: string, listener: (...args: unknown[]) => void) => void;
+    }).on(
+      "error",
       (err: unknown) => {
         logger.error("Redis client error", { error: err });
         isConnected = false;
-      }
+      },
     );
 
-    (redisClient as unknown as { on: (event: string, listener: (...args: unknown[]) => void) => void }).on(
-      "connect", 
+    (redisClient as unknown as {
+      on: (event: string, listener: (...args: unknown[]) => void) => void;
+    }).on(
+      "connect",
       () => {
         logger.info("Redis client connected");
         isConnected = true;
-      }
+      },
     );
 
     await redisClient.connect();
@@ -68,9 +72,9 @@ export const closeRedisClient = async (): Promise<void> => {
   if (isClosing || !redisClient || !isConnected) {
     return;
   }
-  
+
   isClosing = true; // Set closing flag to prevent multiple close attempts
-  
+
   try {
     logger.info("Closing Redis client connection");
     await redisClient.quit();
@@ -110,7 +114,11 @@ export const getFromCache = async <T>(key: string): Promise<T | null> => {
 /**
  * Set value in cache
  */
-export const setInCache = async <T>(key: string, value: T, ttl = CACHE_TTL): Promise<boolean> => {
+export const setInCache = async <T>(
+  key: string,
+  value: T,
+  ttl = CACHE_TTL,
+): Promise<boolean> => {
   if (!redisClient || !isConnected) return false;
 
   try {
@@ -134,7 +142,10 @@ export const deleteFromCache = async (key: string): Promise<boolean> => {
     return true;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`Failed to delete from cache: ${errorMessage}`, { error, key });
+    logger.error(`Failed to delete from cache: ${errorMessage}`, {
+      error,
+      key,
+    });
     return false;
   }
 };
@@ -153,4 +164,4 @@ export const flushCache = async (): Promise<boolean> => {
     logger.error(`Failed to flush cache: ${errorMessage}`, { error });
     return false;
   }
-}; 
+};

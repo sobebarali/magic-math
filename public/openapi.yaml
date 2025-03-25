@@ -11,11 +11,11 @@ info:
     name: API Support
     email: support@example.com
 servers:
-  - url: 'http://localhost:5000'
+  - url: "http://localhost:5000"
     description: Local development server
-  - url: 'http://localhost:8080'
+  - url: "http://localhost:8080"
     description: Docker development server
-  - url: 'https://api.example.com'
+  - url: "https://api.example.com"
     description: Production server
 
 tags:
@@ -27,7 +27,7 @@ tags:
     description: System operations
 
 paths:
-  '/{number}':
+  "/{number}":
     get:
       tags:
         - calculation
@@ -42,26 +42,26 @@ paths:
             type: integer
             minimum: 0
       responses:
-        '200':
+        "200":
           description: Successful calculation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MagicMathResult'
-        '400':
+                $ref: "#/components/schemas/MagicMathResult"
+        "400":
           description: Invalid input
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '429':
+                $ref: "#/components/schemas/Error"
+        "429":
           description: Too many requests
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RateLimitError'
+                $ref: "#/components/schemas/RateLimitError"
 
-  '/api/v1/{number}':
+  "/api/v1/{number}":
     get:
       tags:
         - calculation
@@ -76,26 +76,26 @@ paths:
             type: integer
             minimum: 0
       responses:
-        '200':
+        "200":
           description: Successful calculation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MagicMathResult'
-        '400':
+                $ref: "#/components/schemas/MagicMathResult"
+        "400":
           description: Invalid input
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '429':
+                $ref: "#/components/schemas/Error"
+        "429":
           description: Too many requests
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RateLimitError'
+                $ref: "#/components/schemas/RateLimitError"
 
-  '/batch':
+  "/batch":
     post:
       tags:
         - batch
@@ -116,7 +116,7 @@ paths:
                     type: integer
                   example: [0, 1, 2, 3, 4, 5]
       responses:
-        '200':
+        "200":
           description: Successful batch calculation
           content:
             application/json:
@@ -127,22 +127,22 @@ paths:
                     type: array
                     items:
                       oneOf:
-                        - $ref: '#/components/schemas/MagicMathResult'
-                        - $ref: '#/components/schemas/BatchItemError'
-        '400':
+                        - $ref: "#/components/schemas/MagicMathResult"
+                        - $ref: "#/components/schemas/BatchItemError"
+        "400":
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '429':
+                $ref: "#/components/schemas/Error"
+        "429":
           description: Too many requests
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RateLimitError'
+                $ref: "#/components/schemas/RateLimitError"
 
-  '/api/v1/batch':
+  "/api/v1/batch":
     post:
       tags:
         - batch
@@ -163,7 +163,7 @@ paths:
                     type: integer
                   example: [0, 1, 2, 3, 4, 5]
       responses:
-        '200':
+        "200":
           description: Successful batch calculation
           content:
             application/json:
@@ -174,60 +174,60 @@ paths:
                     type: array
                     items:
                       oneOf:
-                        - $ref: '#/components/schemas/MagicMathResult'
-                        - $ref: '#/components/schemas/BatchItemError'
-        '400':
+                        - $ref: "#/components/schemas/MagicMathResult"
+                        - $ref: "#/components/schemas/BatchItemError"
+        "400":
           description: Invalid request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '429':
+                $ref: "#/components/schemas/Error"
+        "429":
           description: Too many requests
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RateLimitError'
+                $ref: "#/components/schemas/RateLimitError"
 
-  '/benchmark':
+  "/benchmark":
     get:
       tags:
         - system
       summary: Get benchmark data
       description: Returns performance comparison data between recursive and iterative implementations
       responses:
-        '200':
+        "200":
           description: Benchmark data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BenchmarkData'
-        '429':
+                $ref: "#/components/schemas/BenchmarkData"
+        "429":
           description: Too many requests
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RateLimitError'
+                $ref: "#/components/schemas/RateLimitError"
 
-  '/health':
+  "/health":
     get:
       tags:
         - system
       summary: Health check
       description: Check the health status of the API
       responses:
-        '200':
+        "200":
           description: Health status
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthStatus'
-        '429':
+                $ref: "#/components/schemas/HealthStatus"
+        "429":
           description: Too many requests
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RateLimitError'
+                $ref: "#/components/schemas/RateLimitError"
 
 components:
   schemas:
@@ -334,4 +334,4 @@ components:
         cache:
           type: string
           enum: [connected, disconnected]
-          example: connected 
+          example: connected

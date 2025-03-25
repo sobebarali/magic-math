@@ -21,9 +21,9 @@ export const magicMath = (n: number): number => {
   // Base cases
   if (n === 0) return 0;
   if (n === 1) return 1;
-  
+
   // Recursive case with memoization
   const result = magicMath(n - 1) + magicMath(n - 2) + n;
   memo[n] = result;
   return result;
-}; 
+};
