@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.216.0/http/server.ts";
 import { createHandler } from "./api/index.ts";
 import { initRedisClient, closeRedisClient } from "./utils/redis_client.ts";
+import { createRequestLoggerMiddleware } from "./utils/middleware.ts";
+import { logger } from "./utils/logger.ts";
 
 /**
  * Starts the server on the specified port, with automatic fallback if port is in use
@@ -10,34 +12,45 @@ export const startServer = async (initialPort: number): Promise<void> => {
   try {
     await initRedisClient();
   } catch (error: unknown) {
-    console.warn("Redis initialization failed, continuing without caching:", error);
+    logger.warn("Redis initialization failed, continuing without caching", { error });
   }
 
   // Register shutdown handler to close Redis connection
   Deno.addSignalListener("SIGINT", async () => {
-    console.log("Shutting down gracefully...");
+    logger.info("Shutting down gracefully...");
     await closeRedisClient();
     Deno.exit(0);
   });
 
-  const handler = createHandler();
+  // Create the API request handler
+  const apiHandler = createHandler();
+  
+  // Create the logging middleware
+  const requestLoggerMiddleware = createRequestLoggerMiddleware();
+  
+  // Combine middleware with handler
+  const handler = (request: Request) => {
+    return requestLoggerMiddleware(request, apiHandler);
+  };
+  
   let port = initialPort;
   const MAX_PORT_ATTEMPTS = 10;
   
   for (let attempt = 0; attempt < MAX_PORT_ATTEMPTS; attempt++) {
     try {
-      console.log(`Attempting to start Magic Math API on http://127.0.0.1:${port}`);
+      logger.info(`Attempting to start Magic Math API on http://127.0.0.1:${port}`);
       await serve(handler, { port });
       // If serve doesn't throw, we've successfully started
       return;
     } catch (error: unknown) {
       // Check if error is because address is in use
       if (error instanceof Deno.errors.AddrInUse) {
-        console.log(`Port ${port} is already in use. Trying next port...`);
+        logger.warn(`Port ${port} is already in use. Trying next port...`);
         port++;
       } else {
         // For other errors, just throw them
         await closeRedisClient(); // Close Redis connection on error
+        logger.error("Failed to start server", { error });
         throw error;
       }
     }

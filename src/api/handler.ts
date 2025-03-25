@@ -4,6 +4,7 @@ import { join } from "https://deno.land/std@0.216.0/path/mod.ts";
 import { getBenchmarkData } from "../utils/benchmark_data.ts";
 import { getFromCache, setInCache, isRedisConnected } from "../utils/redis_client.ts";
 import { applyRateLimit } from "../utils/rate_limiter.ts";
+import { logger } from "../utils/logger.ts";
 
 // Type definition for cached result
 interface CachedResult {
@@ -70,7 +71,7 @@ async function handleRequest(request: Request, rateLimitHeaders: Record<string, 
   const path = url.pathname;
 
   // Handle static files and special routes
-  if (path === "/" || path.startsWith("/public/")) {
+  if (path === "/" || path.startsWith("/public/") || path === "/swagger/index.html" || path === "/openapi.yaml") {
     return await handleStaticFiles(request, path);
   }
 
@@ -135,11 +136,30 @@ async function handleStaticFiles(request: Request, path: string): Promise<Respon
     let filePath;
     if (path === "/") {
       filePath = join(Deno.cwd(), "public", "index.html");
+    } else if (path === "/swagger/index.html") {
+      filePath = join(Deno.cwd(), "public", "swagger", "index.html");
+    } else if (path === "/openapi.yaml") {
+      filePath = join(Deno.cwd(), "public", "openapi.yaml");
     } else {
-      filePath = join(Deno.cwd(), path);
+      // Handle other paths, ensuring they only access files within public directory
+      if (path.startsWith("/public/")) {
+        filePath = join(Deno.cwd(), path);
+      } else {
+        return new Response("Access denied", { status: 403 });
+      }
     }
+    
+    // Log the file path being accessed
+    logger.debug(`Serving static file: ${filePath}`, { path });
+    
     return await serveFile(request, filePath);
-  } catch (_error) {
+  } catch (error) {
+    // Log the error
+    logger.error(`Error serving static file: ${error instanceof Error ? error.message : String(error)}`, { 
+      path,
+      error
+    });
+    
     // Fallback to API info if file not found
     if (path === "/") {
       return new Response(
@@ -156,7 +176,7 @@ async function handleStaticFiles(request: Request, path: string): Promise<Respon
         }
       );
     } else {
-      return new Response("File not found", { status: 404 });
+      return new Response(`File not found: ${path}`, { status: 404 });
     }
   }
 }

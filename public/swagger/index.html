@@ -35,12 +35,14 @@
   <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js" crossorigin></script>
   <script>
     window.onload = function() {
-      // Get the current host
+      // Get the current host and url
       const host = window.location.host;
+      const protocol = window.location.protocol;
+      const basePath = protocol + '//' + host;
       
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "/openapi.yaml",
+        url: `${basePath}/openapi.yaml`,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -55,6 +57,9 @@
         docExpansion: "list",
         operationsSorter: "method",
         defaultModelsExpandDepth: 1,
+        tryItOutEnabled: true,
+        showExtensions: true,
+        showCommonExtensions: true,
       });
       
       // End Swagger UI call region
