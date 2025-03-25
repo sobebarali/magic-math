@@ -54,7 +54,7 @@ Build and run the Docker container:
 
 ```bash
 docker build -t magic-math-api .
-docker run -p 8080:5000 magic-math-api
+docker run -p 5000:5000 magic-math-api
 ```
 
 ### Using Docker Compose
@@ -82,7 +82,7 @@ http://127.0.0.1:5000/
 or if using Docker:
 
 ```json
-http://127.0.0.1:8080/
+http://127.0.0.1:5000/
 ```
 
 The UI allows you to:
