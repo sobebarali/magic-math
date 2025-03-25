@@ -335,7 +335,8 @@ deno run --allow-net --allow-env benchmark.ts 100 10
 
 ### Git Hooks
 
-This project uses custom Git hooks for Deno, similar to Husky in Node.js projects. These hooks ensure code quality and consistency:
+This project uses custom Git hooks for Deno, similar to Husky in Node.js
+projects. These hooks ensure code quality and consistency:
 
 - **Pre-commit Hook**: Automatically runs formatting and linting on staged files
 - **Post-merge Hook**: Refreshes dependencies when package configuration changes
