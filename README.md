@@ -241,7 +241,7 @@ CACHE_TTL=3600
 
 ### Rate Limiting
 
-Configure rate limiting with these environment variables:
+The API includes robust rate limiting with Redis support:
 
 ```bash
 # Maximum requests per window
@@ -249,6 +249,19 @@ RATE_LIMIT_MAX=100
 
 # Rate limit window in milliseconds (default: 60000 - 1 minute)
 RATE_LIMIT_WINDOW=60000
+```
+
+The rate limiter automatically uses Redis when available, with the following benefits:
+- Distributed rate limiting across multiple API instances
+- Persistence across server restarts
+- Automatic fallback to in-memory rate limiting if Redis is unavailable
+
+Rate limit headers are included in all responses:
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 99
+X-RateLimit-Reset: 1631234567
+X-RateLimit-Backend: redis
 ```
 
 ## Port Configuration

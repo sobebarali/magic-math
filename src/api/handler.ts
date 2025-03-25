@@ -19,7 +19,7 @@ interface CachedResult {
 export const createHandler = () => {
   return async (request: Request): Promise<Response> => {
     // Apply rate limiting
-    const { rateLimited, headers: rateLimitHeaders } = applyRateLimit(request);
+    const { rateLimited, headers: rateLimitHeaders } = await applyRateLimit(request);
     
     // If rate limited, return 429 Too Many Requests
     if (rateLimited) {
