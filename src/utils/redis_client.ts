@@ -1,5 +1,5 @@
 import { createClient } from "npm:redis@4.7.0";
-import type { RedisClientType } from "npm:redis@4.7.0";
+import type { RedisClientType as _RedisClientType } from "npm:redis@4.7.0";
 
 /**
  * Redis client configuration

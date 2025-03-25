@@ -75,17 +75,18 @@ docker-compose up -d
 
 The application includes a web interface accessible at the root URL:
 
-```
+```json
 http://127.0.0.1:5000/
 ```
 
 or if using Docker:
 
-```
+```json
 http://127.0.0.1:8080/
 ```
 
 The UI allows you to:
+
 - Enter any non-negative integer
 - See the calculated Magic Math result
 - Visualize the entire Magic Math sequence up to your input
@@ -94,7 +95,7 @@ The UI allows you to:
 
 ### Calculate Magic Math
 
-```
+```json
 GET /:number
 ```
 
@@ -132,7 +133,7 @@ Response:
 
 ### Batch Processing
 
-```
+```json
 POST /batch
 ```
 
@@ -167,7 +168,7 @@ Response:
 
 ### Health Check
 
-```
+```json
 GET /health
 ```
 
@@ -186,7 +187,7 @@ Response:
 
 Swagger UI is available at:
 
-```
+```json
 http://127.0.0.1:5000/swagger/index.html
 ```
 
@@ -194,14 +195,14 @@ http://127.0.0.1:5000/swagger/index.html
 
 All endpoints are also available with versioning:
 
-```
+```json
 GET /api/v1/:number
 POST /api/v1/batch
 ```
 
 ### Benchmark Data
 
-```
+```json
 GET /benchmark
 ```
 
@@ -252,12 +253,14 @@ RATE_LIMIT_WINDOW=60000
 ```
 
 The rate limiter automatically uses Redis when available, with the following benefits:
+
 - Distributed rate limiting across multiple API instances
 - Persistence across server restarts
 - Automatic fallback to in-memory rate limiting if Redis is unavailable
 
 Rate limit headers are included in all responses:
-```
+
+```json
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 99
 X-RateLimit-Reset: 1631234567
@@ -266,7 +269,7 @@ X-RateLimit-Backend: redis
 
 ## Port Configuration
 
-The server will start at http://127.0.0.1:5000 by default. If port 5000 is already in use, the application will automatically try the next available port (5001, 5002, etc.).
+The server will start at <http://127.0.0.1:5000> by default. If port 5000 is already in use, the application will automatically try the next available port (5001, 5002, etc.).
 
 You can specify a custom port by setting the `PORT` environment variable:
 
@@ -318,5 +321,5 @@ deno run --allow-net --allow-env benchmark.ts 100 10
 - The recursive implementation uses memoization to avoid redundant calculations
 - The iterative implementation avoids stack overflow for large inputs
 - For values ≥ 1000, the API automatically uses the iterative implementation
-- The server automatically tries alternative ports if the default one is in use 
-- Docker deployment includes hot-reloading for development 
+- The server automatically tries alternative ports if the default one is in use
+- Docker deployment includes hot-reloading for development
