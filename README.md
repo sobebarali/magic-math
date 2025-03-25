@@ -65,11 +65,13 @@ docker run -p 5001:5000 -e REDIS_URL="" magic-math-api
 docker run -p 8080:5000 -e PORT=5000 -e REDIS_URL="" magic-math-api
 ```
 
-> **Note**: Port 5000 may already be in use on some systems. You can use a different port like 5001 as shown above.
+> **Note**: Port 5000 may already be in use on some systems. You can use a
+> different port like 5001 as shown above.
 
 ### Using Docker Compose (Recommended)
 
-The recommended way to run the application is with Docker Compose, which automatically sets up both the API and Redis server:
+The recommended way to run the application is with Docker Compose, which
+automatically sets up both the API and Redis server:
 
 ```bash
 # Start the application with Docker Compose
@@ -79,7 +81,8 @@ docker-compose up
 docker-compose up -d
 ```
 
-By default, the application will be accessible at `http://localhost:5001/` as configured in the `docker-compose.yml` file.
+By default, the application will be accessible at `http://localhost:5001/` as
+configured in the `docker-compose.yml` file.
 
 To stop the services:
 
@@ -254,9 +257,11 @@ Response:
 
 ### Redis Caching
 
-The application is configured to use Redis for caching when available. When using Docker Compose, Redis is automatically set up and connected.
+The application is configured to use Redis for caching when available. When
+using Docker Compose, Redis is automatically set up and connected.
 
-If you're running the application without Docker Compose, you can enable Redis caching by setting the following environment variables:
+If you're running the application without Docker Compose, you can enable Redis
+caching by setting the following environment variables:
 
 ```bash
 # Redis connection URL
@@ -276,7 +281,8 @@ REDIS_URL="" deno run --allow-net --allow-env --allow-read main.ts
 docker run -p 5001:5000 -e REDIS_URL="" magic-math-api
 ```
 
-With Docker Compose, Redis is already configured and will be used automatically. To check if Redis is connected, access the health endpoint:
+With Docker Compose, Redis is already configured and will be used automatically.
+To check if Redis is connected, access the health endpoint:
 
 ```bash
 curl http://localhost:5001/health
@@ -335,7 +341,9 @@ docker run -p 8080:8080 -e PORT=8080 magic-math-api
 docker-compose up -d
 ```
 
-> **Note**: In the current configuration, the Docker Compose setup uses port 5001 on the host machine to avoid conflicts with port 5000, which is commonly used by other services.
+> **Note**: In the current configuration, the Docker Compose setup uses port
+> 5001 on the host machine to avoid conflicts with port 5000, which is commonly
+> used by other services.
 
 ## Running Tests
 
@@ -426,26 +434,30 @@ deno lint
 
 ### Port Already in Use
 
-If you see an error like `Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:5000 -> 0.0.0.0:0: listen tcp 0.0.0.0:5000: bind: address already in use`, you can:
+If you see an error like
+`Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:5000 -> 0.0.0.0:0: listen tcp 0.0.0.0:5000: bind: address already in use`,
+you can:
 
 1. Change the port mapping in docker-compose.yml:
    ```yml
    ports:
-     - "5001:5000"  # Use port 5001 on host instead of 5000
+     - "5001:5000" # Use port 5001 on host instead of 5000
    ```
 
 2. Or stop the process using port 5000:
    ```bash
    # Find process using port 5000
    lsof -i :5000
-   
+
    # Kill the process
    kill -9 [PID]
    ```
 
 ### Redis Connection Issues
 
-If you see Redis connection errors but the application is still working, this is normal behavior when Redis is not available. The application will fall back to in-memory caching.
+If you see Redis connection errors but the application is still working, this is
+normal behavior when Redis is not available. The application will fall back to
+in-memory caching.
 
 To ensure Redis is running properly with Docker Compose:
 
@@ -459,7 +471,9 @@ docker logs magic-math-redis
 
 ### Platform Warning in Docker
 
-If you see a warning like `The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8)`, you can:
+If you see a warning like
+`The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8)`,
+you can:
 
 1. Specify the platform when building:
    ```bash
@@ -471,7 +485,8 @@ If you see a warning like `The requested image's platform (linux/amd64) does not
    FROM --platform=linux/arm64 denoland/deno:1.37.0
    ```
 
-This warning typically appears when running on Apple Silicon (M1/M2/M3) Macs but doesn't affect functionality in most cases.
+This warning typically appears when running on Apple Silicon (M1/M2/M3) Macs but
+doesn't affect functionality in most cases.
 
 ### For Developers: Working with Deno npm Dependencies
 
